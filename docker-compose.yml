@@ -1,0 +1,47 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────
+#  ETL Pipeline Demo — Docker Compose
+#  Two services:
+#    db      → PostgreSQL 15 (stores processed data)
+#    pipeline → Python app that runs the ETL on startup
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: etl_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: etl_demo
+      POSTGRES_USER: etl_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-etl_secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U etl_user -d etl_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pipeline:
+    build: .
+    container_name: etl_pipeline
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: etl_demo
+      DB_USER: etl_user
+      DB_PASSWORD: ${DB_PASSWORD:-etl_secret}
+    volumes:
+      - ./data:/app/data      # mount so processed CSV is visible on host
+    command: python src/pipeline.py --input data/raw/heart.csv
+
+volumes:
+  postgres_data:

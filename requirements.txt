@@ -1,0 +1,5 @@
+pandas==2.2.2
+scikit-learn==1.4.2
+sqlalchemy==2.0.30
+psycopg2-binary==2.9.9
+pytest==8.2.0
