@@ -75,7 +75,7 @@ Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) insta
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/<your-username>/etl-pipeline-demo.git
+git clone https://github.com/oleong/etl-pipeline-demo.git
 cd etl-pipeline-demo
 
 # 2. Download the dataset and place it at data/raw/heart.csv
